@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
+import android.graphics.Color.argb
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -48,8 +49,9 @@ class MainActivity : AppCompatActivity() {
                 fun getPhaseColor(phase: Int) = getColor(COLORS[phase % COLORS.size])
 
                 var phase = 0
-                mainContainer.setBackgroundColor( getPhaseColor(phase) )
-                delay(START_DELAY)
+                val startColor = getPhaseColor(phase)
+                mainContainer.setBackgroundColor( startColor )
+                label.setTextColor( startColor.complementaryColor() )
 
                 while(true) {
                     animateColor(
@@ -94,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             colorView.setBackgroundColor(backgroundColor)
 
 
-            val textColor = ((0xFFFFFF - backgroundColor and 0xFFFFFF) and 0xFFFFFF) or (0xFF shl 24)
+            val textColor = backgroundColor.complementaryColor()
             labelView.text = String.format("#%06X", 0xFFFFFF and backgroundColor)
             labelView.setTextColor( textColor )
             labelView.alpha = 1.0f
@@ -130,5 +132,19 @@ class MainActivity : AppCompatActivity() {
         })
 
         animator.start()
+    }
+
+    fun Int.complementaryColor(): Int {
+        val a = this shr 24 and 0xff
+        val r = this shr 16 and 0xff
+        val g = this shr 8 and 0xff
+        val b = this and 0xff
+
+        return argb(
+            a,
+            (r xor 0xff) and 0xff,
+            (g xor 0xff) and 0xff,
+            (b xor 0xff) and 0xff
+        )
     }
 }
