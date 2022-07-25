@@ -104,9 +104,12 @@ class MainActivity : AppCompatActivity() {
 
         fun exit(animation: Animator?) {
             colorView.setOnClickListener(null)
-            continuation.resume(
-                ((animation as? ValueAnimator)?.animatedValue as? Int) ?: 0
-            )
+            if (continuation.isActive) {
+                // Don't call resume if not currently active. Animator can make multiple end callbacks.
+                continuation.resume(
+                    ((animation as? ValueAnimator)?.animatedValue as? Int) ?: 0
+                )
+            }
         }
 
         continuation.invokeOnCancellation {
